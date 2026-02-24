@@ -740,9 +740,13 @@ document.getElementById('hsForm').addEventListener('submit',async function(e){
     timestamp:new Date().toLocaleString()
   };
 
-  try{
-    await fetch(`${URL_GS}?sheet=${SHEET}`,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
-  }catch(err){console.error(err);}
+// Fire and forget — don't await no-cors requests, they never resolve
+fetch(`${URL_GS}?sheet=${SHEET}`, {
+  method: 'POST',
+  mode: 'no-cors',
+  headers: {'Content-Type': 'application/json'},
+  body: JSON.stringify(data)
+}).catch(err => console.error(err));
 
   document.getElementById('s_dept').textContent=data.department;
   document.getElementById('s_loc').textContent=data.location;
@@ -760,3 +764,4 @@ document.getElementById('hsForm').addEventListener('submit',async function(e){
 </body>
 
 </html>
+
