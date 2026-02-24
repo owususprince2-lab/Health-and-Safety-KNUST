@@ -625,152 +625,215 @@
 
 <footer>&copy; KNUST College of Engineering · Health &amp; Safety Systems Assessment · Powered by Google Sheets</footer>
 
+<!-- REPLACE EVERYTHING FROM <script> TO </script> AT THE BOTTOM OF YOUR FILE WITH THIS -->
 <script>
-const TOTAL=7;
-const URL_GS="https://script.google.com/macros/s/AKfycbyxgjhN1NOIq-vlH3L52uXInw34bgjgf46xOSZ1DgXXp6jFxBLWOX6olEZzH5KBWDBH/exec";
-const SHEET="Sheet1";
-let cur=1;
+const TOTAL = 7;
+const URL_GS = "https://script.google.com/macros/s/AKfycbyxgjhN1NOIq-vlH3L52uXInw34bgjgf46xOSZ1DgXXp6jFxBLWOX6olEZzH5KBWDBH/exec";
+const SHEET = "Sheet1";
+let cur = 1;
 
-function buildDots(){
-  const w=document.getElementById('stepDots');w.innerHTML='';
-  for(let i=1;i<=TOTAL;i++){const d=document.createElement('div');d.className='step-dot'+(i<cur?' done':(i===cur?' active':''));w.appendChild(d);}
-  document.getElementById('progressLabel').textContent=`Step ${cur} of ${TOTAL}`;
-}
-function showPage(n){
-  document.querySelectorAll('.form-page').forEach(p=>p.classList.remove('active'));
-  document.querySelector(`[data-page="${n}"]`).classList.add('active');
-  cur=n;buildDots();window.scrollTo({top:0,behavior:'smooth'});
-}
-function goNext(from){
-  if(from===1){
-    const ok=['department','location','assessmentDate','leadAssessor'].every(id=>document.getElementById(id).value.trim());
-    if(!ok){alert('Please fill in all required fields (marked *) before continuing.');return;}
+function buildDots() {
+  const w = document.getElementById('stepDots');
+  w.innerHTML = '';
+  for (let i = 1; i <= TOTAL; i++) {
+    const d = document.createElement('div');
+    d.className = 'step-dot' + (i < cur ? ' done' : (i === cur ? ' active' : ''));
+    w.appendChild(d);
   }
-  if(from<TOTAL)showPage(from+1);
+  document.getElementById('progressLabel').textContent = `Step ${cur} of ${TOTAL}`;
 }
-function goPrev(from){if(from>1)showPage(from-1);}
+
+function showPage(n) {
+  document.querySelectorAll('.form-page').forEach(p => p.classList.remove('active'));
+  document.querySelector(`[data-page="${n}"]`).classList.add('active');
+  cur = n;
+  buildDots();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function goNext(from) {
+  if (from === 1) {
+    const ok = ['department','location','assessmentDate','leadAssessor']
+      .every(id => document.getElementById(id).value.trim());
+    if (!ok) { alert('Please fill in all required fields (marked *) before continuing.'); return; }
+  }
+  if (from < TOTAL) showPage(from + 1);
+}
+
+function goPrev(from) {
+  if (from > 1) showPage(from - 1);
+}
+
 buildDots();
 
-function rv(n){const e=document.querySelector(`input[name="${n}"]:checked`);return e?e.value:'';}
-function cv(n){return[...document.querySelectorAll(`input[name="${n}"]:checked`)].map(e=>e.value).join(', ');}
-function tv(n){const e=document.querySelector(`[name="${n}"]`);return e?e.value.trim():'';}
-function mv(n){return[...document.querySelectorAll(`input[name="${n}"]`)].map(e=>e.value.trim()).filter(Boolean).join(' | ');}
-function chkv(n){return document.querySelector(`input[name="${n}"]`)?.checked?'Yes':'No';}
-function ppe(a,s,u){return(document.querySelector(`input[name="${a}"]`)?.checked?'Avail ':'')+
-                           (document.querySelector(`input[name="${s}"]`)?.checked?'Suit ':'')+
-                           (document.querySelector(`input[name="${u}"]`)?.checked?'Used':'');}
-function gi(id){const e=document.getElementById(id);return e?e.value.trim():'';}
+/* ── helpers ── */
+function rv(n) { const e = document.querySelector(`input[name="${n}"]:checked`); return e ? e.value : ''; }
+function cv(n) { return [...document.querySelectorAll(`input[name="${n}"]:checked`)].map(e => e.value).join(', '); }
+function tv(n) { const e = document.querySelector(`[name="${n}"]`); return e ? e.value.trim() : ''; }
+function mv(n) { return [...document.querySelectorAll(`input[name="${n}"]`)].map(e => e.value.trim()).filter(Boolean).join(' | '); }
+function chk(n) { return document.querySelector(`input[name="${n}"]`)?.checked ? 'Yes' : 'No'; }
+function ppe(a, s, u) {
+  return (document.querySelector(`input[name="${a}"]`)?.checked ? 'Available ' : '') +
+         (document.querySelector(`input[name="${s}"]`)?.checked ? 'Suitable ' : '') +
+         (document.querySelector(`input[name="${u}"]`)?.checked ? 'Used Correctly' : '');
+}
+function gi(id) { const e = document.getElementById(id); return e ? e.value.trim() : ''; }
 
-document.getElementById('hsForm').addEventListener('submit',async function(e){
+/* ── submit ── */
+document.getElementById('hsForm').addEventListener('submit', function(e) {
   e.preventDefault();
-  if(!gi('signName')||!gi('signDate')){alert('Please fill in the Lead Assessor name and sign-off date.');return;}
-  const btn=document.getElementById('submitBtn');btn.disabled=true;btn.innerHTML='<span class="spinner"></span> Submitting…';
 
-  const hA=[...document.querySelectorAll('input[name="ha[]"]')];
-  const hH=[...document.querySelectorAll('input[name="hh[]"]')];
-  const hR=[...document.querySelectorAll('select[name="hr[]"]')];
-  const hC=[...document.querySelectorAll('input[name="hc[]"]')];
-  const hD=[...document.querySelectorAll('input[name="hd[]"]')];
-  const hazRows=hA.map((_,i)=>`[${hA[i].value}|${hH[i].value}|${hR[i].value}|${hC[i].value}|${hD[i].value}]`).filter(r=>r!=='[||||]').join(', ');
+  if (!gi('signName') || !gi('signDate')) {
+    alert('Please fill in the Lead Assessor name and sign-off date.');
+    return;
+  }
 
-  const gI=[...document.querySelectorAll('input[name="gi[]"]')];
-  const gR=[...document.querySelectorAll('select[name="gr3[]"]')];
-  const gA=[...document.querySelectorAll('input[name="ga3[]"]')];
-  const gP=[...document.querySelectorAll('input[name="gp[]"]')];
-  const gapRows=gI.map((_,i)=>`[${gI[i].value}|${gR[i].value}|${gA[i].value}|${gP[i].value}]`).filter(r=>r!=='[|||]').join(', ');
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Submitting…';
 
-  const rA=[...document.querySelectorAll('input[name="ra[]"]')];
-  const rAct=[...document.querySelectorAll('input[name="ract[]"]')];
-  const riskRows=rA.map((_,i)=>`[${rA[i].value}|${rAct[i].value}]`).filter(r=>r!=='[|]').join(', ');
+  /* ── build hazard rows ── */
+  const hA = [...document.querySelectorAll('input[name="ha[]"]')];
+  const hH = [...document.querySelectorAll('input[name="hh[]"]')];
+  const hR = [...document.querySelectorAll('select[name="hr[]"]')];
+  const hC = [...document.querySelectorAll('input[name="hc[]"]')];
+  const hD = [...document.querySelectorAll('input[name="hd[]"]')];
+  const hazardRows = hA
+    .map((_, i) => `[${hA[i].value}|${hH[i].value}|${hR[i].value}|${hC[i].value}|${hD[i].value}]`)
+    .filter(r => r !== '[||||]')
+    .join(', ');
 
-  const overallStatus=rv('overallStatus');
+  /* ── build gap rows ── */
+  const gI  = [...document.querySelectorAll('input[name="gi[]"]')];
+  const gR  = [...document.querySelectorAll('select[name="gr3[]"]')];
+  const gA  = [...document.querySelectorAll('input[name="ga3[]"]')];
+  const gP  = [...document.querySelectorAll('input[name="gp[]"]')];
+  const gapRows = gI
+    .map((_, i) => `[${gI[i].value}|${gR[i].value}|${gA[i].value}|${gP[i].value}]`)
+    .filter(r => r !== '[|||]')
+    .join(', ');
 
-  const data={
-    department:gi('department'),location:gi('location'),assessmentDate:gi('assessmentDate'),leadAssessor:gi('leadAssessor'),
-    areaTypes:cv('areaType'),teamMembers:mv('team'),methodology:cv('methodology'),
-    gov_policyExists:rv('gov1'),gov_policyExists_rem:tv('gov1_rem'),
-    gov_policyCom:rv('gov2'),gov_policyCom_rem:tv('gov2_rem'),
-    gov_roles:rv('gov3'),gov_roles_rem:tv('gov3_rem'),
-    gov_committee:rv('gov4'),gov_committee_rem:tv('gov4_rem'),
-    gov_compliance:rv('gov5'),gov_compliance_rem:tv('gov5_rem'),
-    govObservations:tv('govObs'),
-    hazardRows,riskDocumented:rv('riskDoc'),riskFrequency:rv('riskFreq'),riskObservations:tv('riskObs'),
-    inf_layout:rv('inf1'),inf_layout_rem:tv('inf1r'),
-    inf_machine:rv('inf2'),inf_machine_rem:tv('inf2r'),
-    inf_elec:rv('inf3'),inf_elec_rem:tv('inf3r'),
-    inf_chem:rv('inf4'),inf_chem_rem:tv('inf4r'),
-    inf_vent:rv('inf5'),inf_vent_rem:tv('inf5r'),
-    bld_struct:rv('bld1'),bld_struct_rem:tv('bld1r'),
-    bld_walk:rv('bld2'),bld_walk_rem:tv('bld2r'),
-    bld_emLight:rv('bld3'),bld_emLight_rem:tv('bld3r'),
-    bld_fire:rv('bld4'),bld_fire_rem:tv('bld4r'),
-    ppe_boots:ppe('ba','bs','bu'),ppe_boots_rem:tv('br'),
-    ppe_helm:ppe('ha2','hs2','hu2'),ppe_helm_rem:tv('hr2'),
-    ppe_gog:ppe('ga','gs','gu'),ppe_gog_rem:tv('gr'),
-    ppe_glove:ppe('gla','gls','glu'),ppe_glove_rem:tv('glr'),
-    ppe_coat:ppe('ca','cs','cu'),ppe_coat_rem:tv('cr'),
-    ppePolicyCom:rv('ppePolicyCom'),ppeEnforcement:rv('ppeEnf'),
-    tr_staffInduction:rv('tr1'),tr_staffInduction_rem:tv('tr1r'),
-    tr_studentInduction:rv('tr2'),tr_studentInduction_rem:tv('tr2r'),
-    tr_specialized:rv('tr3'),tr_specialized_rem:tv('tr3r'),
-    tr_records:rv('tr4'),tr_records_rem:tv('tr4r'),
-    tr_competence:rv('tr5'),tr_competence_rem:tv('tr5r'),
-    em_plan:rv('em1'),em_plan_rem:tv('em1r'),
-    em_extinguisher:rv('em2'),em_extinguisher_rem:tv('em2r'),
-    em_exits:rv('em3'),em_exits_rem:tv('em3r'),
-    em_assembly:rv('em4'),em_assembly_rem:tv('em4r'),
-    em_drills:rv('em5'),em_drills_rem:tv('em5r'),
-    inc_reporting:rv('inc1'),inc_reporting_rem:tv('inc1r'),
-    inc_investigation:rv('inc2'),inc_investigation_rem:tv('inc2r'),
-    inc_corrective:rv('inc3'),inc_corrective_rem:tv('inc3r'),
-    inc_trends:rv('inc4'),inc_trends_rem:tv('inc4r'),
-    oh_monitoring:rv('oh1'),oh_monitoring_rem:tv('oh1r'),
-    oh_firstaid:rv('oh2'),oh_firstaid_rem:tv('oh2r'),
-    oh_aiders:rv('oh3'),oh_aiders_rem:tv('oh3r'),
-    oh_medical:rv('oh4'),oh_medical_rem:tv('oh4r'),
-    sc_signs:rv('sc1'),sc_signs_rem:tv('sc1r'),
-    sc_meetings:rv('sc2'),sc_meetings_rem:tv('sc2r'),
-    sc_engagement:rv('sc3'),sc_engagement_rem:tv('sc3r'),
-    sc_reporting:rv('sc4'),sc_reporting_rem:tv('sc4r'),
-    leg_laws:rv('leg1'),leg_permits:rv('leg2'),leg_gaps:rv('leg3'),legalDetails:tv('legalDetails'),
-    strengths:[...document.querySelectorAll('input[name="st[]"]')].map(e=>e.value.trim()).filter(Boolean).join(' | '),
-    gapRows,overallStatus,immediateActions:riskRows,
-    recommendations:[...document.querySelectorAll('input[name="rec[]"]')].map(e=>e.value.trim()).filter(Boolean).join(' | '),
-    signoffName:gi('signName'),signoffDate:gi('signDate'),signoffSig:gi('signSig'),
-    timestamp:new Date().toLocaleString()
+  /* ── build risk action rows ── */
+  const rA   = [...document.querySelectorAll('input[name="ra[]"]')];
+  const rAct = [...document.querySelectorAll('input[name="ract[]"]')];
+  const riskRows = rA
+    .map((_, i) => `[${rA[i].value}|${rAct[i].value}]`)
+    .filter(r => r !== '[|]')
+    .join(', ');
+
+  const overallStatus = rv('overallStatus');
+
+  /* ── assemble data object ── */
+  const data = {
+    department:           gi('department'),
+    location:             gi('location'),
+    assessmentDate:       gi('assessmentDate'),
+    leadAssessor:         gi('leadAssessor'),
+    areaTypes:            cv('areaType'),
+    teamMembers:          mv('team'),
+    methodology:          cv('methodology'),
+
+    gov_policyExists:     rv('gov1'),  gov_policyExists_rem:  tv('gov1_rem'),
+    gov_policyCom:        rv('gov2'),  gov_policyCom_rem:     tv('gov2_rem'),
+    gov_roles:            rv('gov3'),  gov_roles_rem:         tv('gov3_rem'),
+    gov_committee:        rv('gov4'),  gov_committee_rem:     tv('gov4_rem'),
+    gov_compliance:       rv('gov5'),  gov_compliance_rem:    tv('gov5_rem'),
+    govObservations:      tv('govObs'),
+
+    hazardRows:           hazardRows,
+    riskDocumented:       rv('riskDoc'),
+    riskFrequency:        rv('riskFreq'),
+    riskObservations:     tv('riskObs'),
+
+    inf_layout:           rv('inf1'),  inf_layout_rem:        tv('inf1r'),
+    inf_machine:          rv('inf2'),  inf_machine_rem:       tv('inf2r'),
+    inf_elec:             rv('inf3'),  inf_elec_rem:          tv('inf3r'),
+    inf_chem:             rv('inf4'),  inf_chem_rem:          tv('inf4r'),
+    inf_vent:             rv('inf5'),  inf_vent_rem:          tv('inf5r'),
+
+    bld_struct:           rv('bld1'),  bld_struct_rem:        tv('bld1r'),
+    bld_walk:             rv('bld2'),  bld_walk_rem:          tv('bld2r'),
+    bld_emLight:          rv('bld3'),  bld_emLight_rem:       tv('bld3r'),
+    bld_fire:             rv('bld4'),  bld_fire_rem:          tv('bld4r'),
+
+    ppe_boots:            ppe('ba','bs','bu'),     ppe_boots_rem:  tv('br'),
+    ppe_helm:             ppe('ha2','hs2','hu2'),  ppe_helm_rem:   tv('hr2'),
+    ppe_gog:              ppe('ga','gs','gu'),     ppe_gog_rem:    tv('gr'),
+    ppe_glove:            ppe('gla','gls','glu'),  ppe_glove_rem:  tv('glr'),
+    ppe_coat:             ppe('ca','cs','cu'),     ppe_coat_rem:   tv('cr'),
+    ppePolicyCom:         rv('ppePolicyCom'),
+    ppeEnforcement:       rv('ppeEnf'),
+
+    tr_staffInduction:    rv('tr1'),   tr_staffInduction_rem:    tv('tr1r'),
+    tr_studentInduction:  rv('tr2'),   tr_studentInduction_rem:  tv('tr2r'),
+    tr_specialized:       rv('tr3'),   tr_specialized_rem:       tv('tr3r'),
+    tr_records:           rv('tr4'),   tr_records_rem:           tv('tr4r'),
+    tr_competence:        rv('tr5'),   tr_competence_rem:        tv('tr5r'),
+
+    em_plan:              rv('em1'),   em_plan_rem:              tv('em1r'),
+    em_extinguisher:      rv('em2'),   em_extinguisher_rem:      tv('em2r'),
+    em_exits:             rv('em3'),   em_exits_rem:             tv('em3r'),
+    em_assembly:          rv('em4'),   em_assembly_rem:          tv('em4r'),
+    em_drills:            rv('em5'),   em_drills_rem:            tv('em5r'),
+
+    inc_reporting:        rv('inc1'),  inc_reporting_rem:        tv('inc1r'),
+    inc_investigation:    rv('inc2'),  inc_investigation_rem:    tv('inc2r'),
+    inc_corrective:       rv('inc3'),  inc_corrective_rem:       tv('inc3r'),
+    inc_trends:           rv('inc4'),  inc_trends_rem:           tv('inc4r'),
+
+    oh_monitoring:        rv('oh1'),   oh_monitoring_rem:        tv('oh1r'),
+    oh_firstaid:          rv('oh2'),   oh_firstaid_rem:          tv('oh2r'),
+    oh_aiders:            rv('oh3'),   oh_aiders_rem:            tv('oh3r'),
+    oh_medical:           rv('oh4'),   oh_medical_rem:           tv('oh4r'),
+
+    sc_signs:             rv('sc1'),   sc_signs_rem:             tv('sc1r'),
+    sc_meetings:          rv('sc2'),   sc_meetings_rem:          tv('sc2r'),
+    sc_engagement:        rv('sc3'),   sc_engagement_rem:        tv('sc3r'),
+    sc_reporting:         rv('sc4'),   sc_reporting_rem:         tv('sc4r'),
+
+    leg_laws:             rv('leg1'),
+    leg_permits:          rv('leg2'),
+    leg_gaps:             rv('leg3'),
+    legalDetails:         tv('legalDetails'),
+
+    strengths:            [...document.querySelectorAll('input[name="st[]"]')].map(e => e.value.trim()).filter(Boolean).join(' | '),
+    gapRows:              gapRows,
+    overallStatus:        overallStatus,
+    immediateActions:     riskRows,
+    recommendations:      [...document.querySelectorAll('input[name="rec[]"]')].map(e => e.value.trim()).filter(Boolean).join(' | '),
+
+    signoffName:          gi('signName'),
+    signoffDate:          gi('signDate'),
+    signoffSig:           gi('signSig'),
+    timestamp:            new Date().toLocaleString()
   };
 
-const formData = new FormData();
-formData.append('data', JSON.stringify(data));
-fetch(`${URL_GS}?sheet=${SHEET}`, {
-  method: 'POST',
-  mode: 'no-cors',
-  body: formData
-}).catch(err => console.error(err));
+  /* ── send to Google Sheets — fire and forget ── */
+  const formData = new FormData();
+  formData.append('data', JSON.stringify(data));
+  fetch(URL_GS + '?sheet=' + SHEET, {
+    method: 'POST',
+    mode: 'no-cors',
+    body: formData
+  }).catch(function(err) { console.error('Fetch error:', err); });
 
-// Show success immediately — do NOT await the fetch
-document.getElementById('s_dept').textContent = data.department;
-// ... rest of success display code
-document.getElementById('hsForm').style.display = 'none';
-document.getElementById('success-wrap').classList.add('show');
-window.scrollTo({top: 0, behavior: 'smooth'});
+  /* ── show success immediately — do NOT wait for fetch ── */
+  document.getElementById('s_dept').textContent   = data.department;
+  document.getElementById('s_loc').textContent    = data.location;
+  document.getElementById('s_date').textContent   = data.assessmentDate;
+  document.getElementById('s_lead').textContent   = data.leadAssessor;
+  document.getElementById('s_status').textContent = data.overallStatus || 'Not specified';
+  document.getElementById('s_time').textContent   = data.timestamp;
 
-  document.getElementById('s_dept').textContent=data.department;
-  document.getElementById('s_loc').textContent=data.location;
-  document.getElementById('s_date').textContent=data.assessmentDate;
-  document.getElementById('s_lead').textContent=data.leadAssessor;
-  document.getElementById('s_status').textContent=overallStatus||'Not specified';
-  document.getElementById('s_time').textContent=data.timestamp;
-
-  document.getElementById('hsForm').style.display='none';
-  const sw=document.getElementById('success-wrap');
-  sw.classList.add('show');
-  window.scrollTo({top:0,behavior:'smooth'});
+  document.getElementById('hsForm').style.display = 'none';
+  document.getElementById('success-wrap').classList.add('show');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 });
 </script>
 </body>
 
 </html>
+
 
 
 
