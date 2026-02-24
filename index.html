@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>H&S Assessment · KNUST College of Engineering</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    :root{
+      --green-dark:#0a4a2e;
+      --green:#1a6b3c;
+      --green-mid:#2d8653;
+      --green-light:#3ea86a;
+      --green-pale:#e8f5ee;
+      --green-faint:#f2faf5;
+      --gold:#c9a03a;
+      --gold-light:#e8c460;
+      --white:#ffffff;
+      --cream:#f9f9f6;
+      --border:#d4e8da;
+      --text:#1c2e24;
+      --muted:#5a7a65;
+      --danger:#c0392b;
+      --warn:#e67e22;
+      --radius:12px;
+      --shadow:0 4px 24px rgba(10,74,46,.10);
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--text);min-height:100vh;}
+
+    .site-header{background:linear-gradient(135deg,var(--green-dark) 0%,var(--green) 60%,var(--green-mid) 100%);position:sticky;top:0;z-index:100;box-shadow:0 2px 20px rgba(0,0,0,.25);}
+    .header-top{display:flex;align-items:center;justify-content:space-between;padding:.9rem 2rem;border-bottom:1px solid rgba(255,255,255,.12);gap:1rem;flex-wrap:wrap;}
+    .logos{display:flex;align-items:center;gap:1.2rem}
+    .logos img{height:54px;width:auto;object-fit:contain;filter:drop-shadow(0 1px 3px rgba(0,0,0,.3))}
+    .logo-divider{width:1px;height:46px;background:rgba(255,255,255,.3)}
+    .header-titles{flex:1}
+    .header-titles h1{font-family:'Playfair Display',serif;font-size:1.1rem;color:#fff;line-height:1.3;}
+    .header-titles p{font-size:.72rem;color:rgba(255,255,255,.7);margin-top:.2rem;letter-spacing:.04em;text-transform:uppercase}
+    .doc-badge{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);color:rgba(255,255,255,.9);font-size:.7rem;font-weight:600;padding:.35rem .85rem;border-radius:100px;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap;}
+    .progress-strip{background:rgba(0,0,0,.2);padding:.5rem 2rem;display:flex;align-items:center;gap:1rem;}
+    .step-dots{display:flex;align-items:center;gap:.4rem;flex:1}
+    .step-dot{height:6px;border-radius:3px;background:rgba(255,255,255,.25);transition:all .3s ease;flex:1;}
+    .step-dot.done{background:var(--gold-light)}
+    .step-dot.active{background:#fff;box-shadow:0 0 8px rgba(255,255,255,.5)}
+    .progress-label{font-size:.72rem;color:rgba(255,255,255,.8);white-space:nowrap;font-weight:500}
+
+    .form-container{max-width:840px;margin:0 auto;padding:2rem 1.5rem 4rem;}
+    .form-page{display:none}
+    .form-page.active{display:block;animation:fadeIn .35s ease}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+    .page-hero{background:linear-gradient(135deg,var(--green-dark),var(--green-mid));border-radius:var(--radius);padding:2rem 2rem 1.6rem;margin-bottom:1.8rem;position:relative;overflow:hidden;}
+    .page-hero::before{content:'';position:absolute;top:-40px;right:-40px;width:180px;height:180px;border-radius:50%;border:2px solid rgba(255,255,255,.1);}
+    .page-hero::after{content:'';position:absolute;bottom:-60px;left:-20px;width:140px;height:140px;border-radius:50%;border:2px solid rgba(255,255,255,.07);}
+    .page-hero-num{display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.15);border:1.5px solid rgba(255,255,255,.3);color:#fff;font-size:.9rem;font-weight:700;margin-bottom:.9rem;}
+    .page-hero h2{font-family:'Playfair Display',serif;font-size:1.55rem;color:#fff;line-height:1.3;margin-bottom:.4rem;}
+    .page-hero p{font-size:.85rem;color:rgba(255,255,255,.72);line-height:1.6}
+
+    .card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);margin-bottom:1.4rem;box-shadow:var(--shadow);overflow:hidden;}
+    .card-header{background:var(--green-faint);border-bottom:1px solid var(--border);padding:.9rem 1.4rem;display:flex;align-items:center;gap:.7rem;}
+    .card-icon{width:30px;height:30px;border-radius:8px;background:var(--green);display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0;}
+    .card-title{font-size:.9rem;font-weight:700;color:var(--green-dark);letter-spacing:.01em}
+    .card-body{padding:1.4rem}
+
+    .field-group{margin-bottom:1.2rem}
+    .field-group:last-child{margin-bottom:0}
+    .field-label{display:block;font-size:.75rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.45rem;}
+    .field-label .req{color:var(--danger);margin-left:2px}
+    input[type=text],input[type=date],select,textarea{width:100%;border:1.5px solid var(--border);border-radius:8px;padding:.65rem .9rem;font-family:'Inter',sans-serif;font-size:.9rem;color:var(--text);background:#fff;outline:none;transition:border-color .2s,box-shadow .2s;}
+    input:focus,select:focus,textarea:focus{border-color:var(--green-mid);box-shadow:0 0 0 3px rgba(45,134,83,.12);}
+    textarea{resize:vertical;min-height:80px;line-height:1.55}
+    select{cursor:pointer}
+    .two-col{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+    @media(max-width:580px){.two-col{grid-template-columns:1fr}}
+
+    .chip-grid{display:flex;flex-wrap:wrap;gap:.5rem}
+    .chip{display:flex;align-items:center;gap:.45rem;padding:.45rem .95rem;border:1.5px solid var(--border);border-radius:100px;font-size:.83rem;cursor:pointer;transition:all .15s;color:var(--text);}
+    .chip:has(input:checked){border-color:var(--green-mid);background:var(--green-pale);color:var(--green-dark);font-weight:600;}
+    .chip input{accent-color:var(--green-mid);width:13px;height:13px}
+
+    .method-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:.6rem}
+    .method-item{display:flex;align-items:center;gap:.6rem;padding:.65rem .9rem;border:1.5px solid var(--border);border-radius:8px;font-size:.85rem;cursor:pointer;transition:all .15s;}
+    .method-item:has(input:checked){border-color:var(--green-mid);background:var(--green-pale);color:var(--green-dark);font-weight:600}
+    .method-item input{accent-color:var(--green-mid)}
+
+    .tbl{width:100%;border-collapse:collapse;font-size:.86rem}
+    .tbl th{background:var(--green-faint);padding:.55rem .75rem;text-align:left;color:var(--muted);font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;border-bottom:1px solid var(--border);}
+    .tbl th.ctr{text-align:center}
+    .tbl td{padding:.5rem .6rem;border-bottom:1px solid #f0f4f0;vertical-align:middle}
+    .tbl td.ctr{text-align:center}
+    .tbl tr:last-child td{border-bottom:none}
+    .tbl input[type=text]{padding:.38rem .6rem;font-size:.84rem}
+    .tbl input[type=radio]{accent-color:var(--green-mid);width:15px;height:15px;cursor:pointer}
+    .tbl input[type=checkbox]{accent-color:var(--green-mid);width:15px;height:15px;cursor:pointer}
+    .tbl select{padding:.38rem .55rem;font-size:.84rem}
+
+    .radio-pair{display:flex;gap:1.2rem;flex-wrap:wrap;align-items:center}
+    .radio-pair label{display:flex;align-items:center;gap:.4rem;font-size:.88rem;cursor:pointer;color:var(--text);font-weight:400;letter-spacing:0;text-transform:none;}
+    .radio-pair input{accent-color:var(--green-mid);width:15px;height:15px}
+
+    .status-grid{display:flex;gap:.7rem;flex-wrap:wrap}
+    .status-chip{flex:1;min-width:150px;display:flex;align-items:center;gap:.55rem;padding:.8rem 1rem;border:2px solid var(--border);border-radius:10px;cursor:pointer;font-size:.88rem;font-weight:500;transition:all .15s;}
+    .status-chip.ok:has(input:checked){border-color:#27ae60;background:rgba(39,174,96,.08);color:#1e8449}
+    .status-chip.partial:has(input:checked){border-color:var(--warn);background:rgba(230,126,34,.08);color:#d35400}
+    .status-chip.bad:has(input:checked){border-color:var(--danger);background:rgba(192,57,43,.08);color:#a93226}
+    .status-chip input{accent-color:var(--green-mid)}
+
+    hr.divider{border:none;border-top:1px solid var(--border);margin:1.2rem 0}
+
+    .nav-buttons{display:flex;justify-content:space-between;align-items:center;margin-top:2rem;padding-top:1.5rem;border-top:1px solid var(--border);flex-wrap:wrap;gap:1rem;}
+    .page-counter{font-size:.78rem;color:var(--muted);font-weight:500}
+    .btn{display:inline-flex;align-items:center;gap:.5rem;padding:.8rem 2rem;border-radius:9px;font-family:'Inter',sans-serif;font-size:.9rem;font-weight:600;cursor:pointer;border:none;transition:all .18s;letter-spacing:.01em;}
+    .btn-prev{background:#fff;color:var(--green-dark);border:1.5px solid var(--border)}
+    .btn-prev:hover{border-color:var(--green-mid);background:var(--green-pale)}
+    .btn-next{background:var(--green);color:#fff;box-shadow:0 4px 14px rgba(26,107,60,.3)}
+    .btn-next:hover{background:var(--green-dark);transform:translateY(-1px)}
+    .btn-submit{background:linear-gradient(135deg,var(--green-dark),var(--green-mid));color:#fff;box-shadow:0 4px 18px rgba(26,107,60,.4);padding:.9rem 2.5rem}
+    .btn-submit:hover{transform:translateY(-1px);box-shadow:0 6px 22px rgba(26,107,60,.45)}
+    .btn-submit:disabled{opacity:.6;cursor:not-allowed;transform:none}
+
+    .spinner{display:inline-block;width:18px;height:18px;border-radius:50%;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;animation:spin .7s linear infinite;vertical-align:middle;margin-right:.4rem;}
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    #success-wrap{display:none;text-align:center;padding:4rem 2rem;max-width:600px;margin:0 auto;}
+    #success-wrap.show{display:block;animation:fadeIn .4s ease}
+    .success-ring{width:90px;height:90px;border-radius:50%;background:linear-gradient(135deg,var(--green-pale),#c8f0d8);border:3px solid var(--green-mid);display:flex;align-items:center;justify-content:center;margin:0 auto 1.8rem;font-size:2.5rem;}
+    #success-wrap h2{font-family:'Playfair Display',serif;font-size:2rem;color:var(--green-dark);margin-bottom:.8rem}
+    #success-wrap p{color:var(--muted);line-height:1.7;font-size:.95rem}
+    .success-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;margin-top:2rem;text-align:left;}
+    .success-card h3{font-size:.9rem;color:var(--green-dark);font-weight:700;margin-bottom:.7rem;text-transform:uppercase;letter-spacing:.06em}
+    .success-item{display:flex;justify-content:space-between;padding:.4rem 0;border-bottom:1px solid #f0f4f0;font-size:.87rem}
+    .success-item:last-child{border-bottom:none}
+    .success-item .lbl{color:var(--muted)} .success-item .val{font-weight:600;color:var(--green-dark)}
+
+    footer{text-align:center;padding:1.2rem;font-size:.75rem;color:var(--muted);border-top:1px solid var(--border);margin-top:2rem;}
+  </style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-top">
+    <div class="logos">
+      <img src="https://coe.knust.edu.gh/sites/coe.knust.edu.gh/files/2017-12/coelogo.png" alt="COE Logo" onerror="this.style.display='none'">
+      <div class="logo-divider"></div>
+      <img src="https://coe.knust.edu.gh/sites/coe.knust.edu.gh/themes/adepts/images/KNUSTlogo.png" alt="KNUST Logo" onerror="this.style.display='none'">
+    </div>
+    <div class="header-titles">
+      <h1>Health &amp; Safety Systems Assessment</h1>
+      <p>KNUST · College of Engineering</p>
+    </div>
+    <div class="doc-badge">Official Form</div>
+  </div>
+  <div class="progress-strip">
+    <div class="step-dots" id="stepDots"></div>
+    <div class="progress-label" id="progressLabel">Step 1 of 7</div>
+  </div>
+</header>
+
+<div class="form-container">
+<form id="hsForm" novalidate>
+
+<!-- PAGE 1 -->
+<div class="form-page active" data-page="1">
+  <div class="page-hero">
+    <div class="page-hero-num">1</div>
+    <h2>General Information</h2>
+    <p>Provide the facility details, assessment team, and inspection area.</p>
+  </div>
+  <div class="card">
+    <div class="card-header"><div class="card-icon">🏛️</div><div class="card-title">Facility Details</div></div>
+    <div class="card-body">
+      <div class="two-col">
+        <div class="field-group">
+          <label class="field-label">College / Department / Unit <span class="req">*</span></label>
+          <input type="text" id="department" placeholder="e.g. Dept. of Mechanical Engineering" required>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Location / Facility Inspected <span class="req">*</span></label>
+          <input type="text" id="location" placeholder="e.g. Engineering Block B, Room 104" required>
+        </div>
+      </div>
+      <div class="two-col">
+        <div class="field-group">
+          <label class="field-label">Date of Assessment <span class="req">*</span></label>
+          <input type="date" id="assessmentDate" required>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Lead Assessor / Chairperson <span class="req">*</span></label>
+          <input type="text" id="leadAssessor" placeholder="Full name" required>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header"><div class="card-icon">📍</div><div class="card-title">Area Type (tick all that apply)</div></div>
+    <div class="card-body">
+      <div class="chip-grid">
+        <label class="chip"><input type="checkbox" name="areaType" value="Laboratory"> 🔬 Laboratory</label>
+        <label class="chip"><input type="checkbox" name="areaType" value="Workshop"> 🔧 Workshop</label>
+        <label class="chip"><input type="checkbox" name="areaType" value="Office"> 🖥️ Office</label>
+        <label class="chip"><input type="checkbox" name="areaType" value="Classroom"> 📚 Classroom</label>
+        <label class="chip"><input type="checkbox" name="areaType" value="Store"> 📦 Store</label>
+        <label class="chip"><input type="checkbox" name="areaType" value="Utility Area"> ⚡ Utility Area</label>
+        <label class="chip"><input type="checkbox" name="areaType" value="Other"> ➕ Other</label>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header"><div class="card-icon">👥</div><div class="card-title">Assessment Team Members</div></div>
+    <div class="card-body">
+      <table class="tbl">
+        <thead><tr><th style="width:40px">#</th><th>Full Name</th></tr></thead>
+        <tbody>
+          <tr><td style="text-align:center;color:var(--muted);font-weight:700;font-size:.8rem">1</td><td><input type="text" name="team" placeholder="Enter name…"></td></tr>
+          <tr><td style="text-align:center;color:var(--muted);font-weight:700;font-size:.8rem">2</td><td><input type="text" name="team" placeholder="Enter name…"></td></tr>
+          <tr><td style="text-align:center;color:var(--muted);font-weight:700;font-size:.8rem">3</td><td><input type="text" name="team" placeholder="Enter name…"></td></tr>
+          <tr><td style="text-align:center;color:var(--muted);font-weight:700;font-size:.8rem">4</td><td><input type="text" name="team" placeholder="Enter name…"></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header"><div class="card-icon">🔍</div><div class="card-title">Assessment Methodology (tick all used)</div></div>
+    <div class="card-body">
+      <div class="method-grid">
+        <label class="method-item"><input type="checkbox" name="methodology" value="Document Review"> 📄 Document Review</label>
+        <label class="method-item"><input type="checkbox" name="methodology" value="Physical Inspection"> 🏗️ Physical Inspection</label>
+        <label class="method-item"><input type="checkbox" name="methodology" value="Interviews"> 🗣️ Interviews (Staff/Students)</label>
+        <label class="method-item"><input type="checkbox" name="methodology" value="Observation"> 👁️ Observation of Activities</label>
+        <label class="method-item"><input type="checkbox" name="methodology" value="Records Review"> 📋 Records Review</label>
+      </div>
+    </div>
+  </div>
+  <div class="nav-buttons">
+    <div class="page-counter">Page 1 of 7</div>
+    <button type="button" class="btn btn-next" onclick="goNext(1)">Next: Policy &amp; Risk →</button>
+  </div>
+</div>
+
+<!-- PAGE 2 -->
+<div class="form-page" data-page="2">
+  <div class="page-hero">
+    <div class="page-hero-num">2</div>
+    <h2>Policy, Risk &amp; Infrastructure</h2>
+    <p>Evaluate governance frameworks, hazard management, and facility safety standards.</p>
+  </div>
+  <div class="card">
+    <div class="card-header"><div class="card-icon">📜</div><div class="card-title">Section 3 — H&amp;S Policy &amp; Governance</div></div>
+    <div class="card-body">
+      <div style="overflow-x:auto">
+      <table class="tbl">
+        <thead><tr><th>Item</th><th class="ctr">Yes</th><th class="ctr">No</th><th class="ctr">Partial</th><th style="min-width:150px">Remarks</th></tr></thead>
+        <tbody>
+          <tr><td>Approved H&amp;S Policy exists</td><td class="ctr"><input type="radio" name="gov1" value="Yes"></td><td class="ctr"><input type="radio" name="gov1" value="No"></td><td class="ctr"><input type="radio" name="gov1" value="Partial"></td><td><input type="text" name="gov1_rem" placeholder="Remarks…"></td></tr>
+          <tr><td>Policy communicated to staff &amp; students</td><td class="ctr"><input type="radio" name="gov2" value="Yes"></td><td class="ctr"><input type="radio" name="gov2" value="No"></td><td class="ctr"><input type="radio" name="gov2" value="Partial"></td><td><input type="text" name="gov2_rem" placeholder="Remarks…"></td></tr>
+          <tr><td>Defined H&amp;S roles and responsibilities</td><td class="ctr"><input type="radio" name="gov3" value="Yes"></td><td class="ctr"><input type="radio" name="gov3" value="No"></td><td class="ctr"><input type="radio" name="gov3" value="Partial"></td><td><input type="text" name="gov3_rem" placeholder="Remarks…"></td></tr>
+          <tr><td>Functional H&amp;S Committee</td><td class="ctr"><input type="radio" name="gov4" value="Yes"></td><td class="ctr"><input type="radio" name="gov4" value="No"></td><td class="ctr"><input type="radio" name="gov4" value="Partial"></td><td><input type="text" name="gov4_rem" placeholder="Remarks…"></td></tr>
+          <tr><td>Compliance with national regulations</td><td class="ctr"><input type="radio" name="gov5" value="Yes"></td><td class="ctr"><input type="radio" name="gov5" value="No"></td><td class="ctr"><input type="radio" name="gov5" value="Partial"></td><td><input type="text" name="gov5_rem" placeholder="Remarks…"></td></tr>
+        </tbody>
+      </table>
+      </div>
+      <hr class="divider">
+      <div class="field-group">
+        <label class="field-label">Key Observations</label>
+        <textarea name="govObs" placeholder="Enter key observations…"></textarea>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header"><div class="card-icon">⚠️</div><div class="card-title">Section 4 — Risk Assessment &amp; Hazard Management</div></div>
+    <div class="card-body">
+      <div style="overflow-x:auto">
+      <table class="tbl">
+        <thead><tr><th style="min-width:100px">Area</th><th style="min-width:150px">Hazard Identified</th><th style="width:75px">Risk</th><th style="min-width:140px">Controls in Place</th><th style="min-width:110px">Adequacy</th></tr></thead>
+        <tbody>
+          <tr><td><input type="text" name="ha[]" placeholder="Area"></td><td><input type="text" name="hh[]" placeholder="Hazard"></td><td><select name="hr[]"><option value="">--</option><option>H</option><option>M</option><option>L</option></select></td><td><input type="text" name="hc[]" placeholder="Controls"></td><td><input type="text" name="hd[]" placeholder="Adequacy"></td></tr>
+          <tr><td><input type="text" name="ha[]" placeholder="Area"></td><td><input type="text" name="hh[]" placeholder="Hazard"></td><td><select name="hr[]"><option value="">--</option><option>H</option><option>M</option><option>L</option></select></td><td><input type="text" name="hc[]" placeholder="Controls"></td><td><input type="text" name="hd[]" placeholder="Adequacy"></td></tr>
+          <tr><td><input type="text" name="ha[]" placeholder="Area"></td><td><input type="text" name="hh[]" placeholder="Hazard"></td><td><select name="hr[]"><option value="">--</option><option>H</option><option>M</option><option>L</option></select></td><td><input type="text" name="hc[]" placeholder="Controls"></td><td><input type="text" name="hd[]" placeholder="Adequacy"></td></tr>
+          <tr><td><input type="text" name="ha[]" placeholder="Area"></td><td><input type="text" name="hh[]" placeholder="Hazard"></td><td><select name="hr[]"><option value="">--</option><option>H</option><option>M</option><option>L</option></select></td><td><input type="text" name="hc[]" placeholder="Controls"></td><td><input type="text" name="hd[]" placeholder="Adequacy"></td></tr>
+          <tr><td><input type="text" name="ha[]" placeholder="Area"></td><td><input type="text" name="hh[]" placeholder="Hazard"></td><td><select name="hr[]"><option value="">--</option><option>H</option><option>M</option><option>L</option></select></td><td><input type="text" name="hc[]" placeholder="Controls"></td><td><input type="text" name="hd[]" placeholder="Adequacy"></td></tr>
+        </tbody>
+      </table>
+      </div>
+      <hr class="divider">
+      <div class="two-col">
+        <div class="field-group"><label class="field-label">Documented risk assessments exist</label><div class="radio-pair"><label><input type="radio" name="riskDoc" value="Yes"> Yes</label><label><input type="radio" name="riskDoc" value="No"> No</label></div></div>
+        <div class="field-group"><label class="field-label">Review frequency adequate</label><div class="radio-pair"><label><input type="radio" name="riskFreq" value="Yes"> Yes</label><label><input type="radio" name="riskFreq" value="No"> No</label></div></div>
+      </div>
+      <div class="field-group"><label class="field-label">Key Observations</label><textarea name="riskObs" placeholder="Enter key observations…"></textarea></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header"><div class="card-icon">🏗️</div><div class="card-title">Section 5a — Laboratories &amp; Workshops</div></div>
+    <div class="card-body">
+      <div style="overflow-x:auto">
+      <table class="tbl">
+        <thead><tr><th>Requirement</th><th class="ctr">Yes</th><th class="ctr">No</th><th style="min-width:150px">Remarks</th></tr></thead>
+        <tbody>
+          <tr><td>Safe layout and space</td><td class="ctr"><input type="radio" name="inf1" value="Yes"></td><td class="ctr"><input type="radio" name="inf1" value="No"></td><td><input type="text" name="inf1r" placeholder="Remarks…"></td></tr>
+          <tr><td>Machine guarding</td><td class="ctr"><input type="radio" name="inf2" value="Yes"></td><td class="ctr"><input type="radio" name="inf2" value="No"></td><td><input type="text" name="inf2r" placeholder="Remarks…"></td></tr>
+          <tr><td>Electrical safety</td><td class="ctr"><input type="radio" name="inf3" value="Yes"></td><td class="ctr"><input type="radio" name="inf3" value="No"></td><td><input type="text" name="inf3r" placeholder="Remarks…"></td></tr>
+          <tr><td>Chemical storage compliance</td><td class="ctr"><input type="radio" name="inf4" value="Yes"></td><td class="ctr"><input type="radio" name="inf4" value="No"></td><td><input type="text" name="inf4r" placeholder="Remarks…"></td></tr>
+          <tr><td>Ventilation and lighting</td><td class="ctr"><input type="radio" name="inf5" value="Yes"></td><td class="ctr"><input type="radio" name="inf5" value="No"></td><td><input type="text" name="inf5r" placeholder="Remarks…"></td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header"><div class="card-icon">🏢</div><div class="card-title">Section 5b — Buildings &amp; Utilities</div></div>
+    <div class="card-body">
+      <div style="overflow-x:auto">
+      <table class="tbl">
+        <thead><tr><th>Requirement</th><th class="ctr">Yes</th><th class="ctr">No</th><th style="min-width:150px">Remarks</th></tr></thead>
+        <tbody>
+          <tr><td>Structural integrity</td><td class="ctr"><input type="radio" name="bld1" value="Yes"></td><td class="ctr"><input type="radio" name="bld1" value="No"></td><td><input type="text" name="bld1r" placeholder="Remarks…"></td></tr>
+          <tr><td>Safe walkways and stairs</td><td class="ctr"><input type="radio" name="bld2" value="Yes"></td><td class="ctr"><input type="radio" name="bld2" value="No"></td><td><input type="text" name="bld2r" placeholder="Remarks…"></td></tr>
+          <tr><td>Emergency lighting</td><td class="ctr"><input type="radio" name="bld3" value="Yes"></td><td class="ctr"><input type="radio" name="bld3" value="No"></td><td><input type="text" name="bld3r" placeholder="Remarks…"></td></tr>
+          <tr><td>Fire detection systems</td><td class="ctr"><input type="radio" name="bld4" value="Yes"></td><td class="ctr"><input type="radio" name="bld4" value="No"></td><td><input type="text" name="bld4r" placeholder="Remarks…"></td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+  </div>
+  <div class="nav-buttons">
+    <button type="button" class="btn btn-prev" onclick="goPrev(2)">← Back</button>
+    <div class="page-counter">Page 2 of 7</div>
+    <button type="button" class="btn btn-next" onclick="goNext(2)">Next: PPE &amp; Training →</button>
+  </div>
+</div>
+
+<!-- PAGE 3 -->
+<div class="form-page" data-page="3">
+  <div class="page-hero">
+    <div class="page-hero-num">3</div>
+    <h2>PPE &amp; Training</h2>
+    <p>Assess personal protective equipment availability and staff/student competence.</p>
+  </div>
+  <div class="card">
+    <div class="card-header"><div class="card-icon">🦺</div><div class="card-title">Section 6 — Personal Protective Equipment (PPE)</div></div>
+    <div class="card-body">
+      <div style="overflow-x:auto">
+      <table class="tbl">
+        <thead><tr><th>PPE Item</th><th class="ctr">Available</th><th class="ctr">Suitable</th><th class="ctr">Used Correctly</th><th style="min-width:140px">Remarks</th></tr></thead>
+        <tbody>
+          <tr><td style="font-weight:600">👢 Safety Boots</td><td class="ctr"><input type="checkbox" name="ba" value="1"></td><td class="ctr"><input type="checkbox" name="bs" value="1"></td><td class="ctr"><input type="checkbox" name="bu" value="1"></td><td><input type="text" name="br" placeholder="Remarks…"></td></tr>
+          <tr><td style="font-weight:600">⛑️ Helmets</td><td class="ctr"><input type="checkbox" name="ha2" value="1"></td><td class="ctr"><input type="checkbox" name="hs2" value="1"></td><td class="ctr"><input type="checkbox" name="hu2" value="1"></td><td><input type="text" name="hr2" placeholder="Remarks…"></td></tr>
+          <tr><td style="font-weight:600">🥽 Goggles / Face Shields</td><td class="ctr"><input type="checkbox" name="ga" value="1"></td><td class="ctr"><input type="checkbox" name="gs" value="1"></td><td class="ctr"><input type="checkbox" name="gu" value="1"></td><td><input type="text" name="gr" placeholder="Remarks…"></td></tr>
+          <tr><td style="font-weight:600">🧤 Gloves</td><td class="ctr"><input type="checkbox" name="gla" value="1"></td><td class="ctr"><input type="checkbox" name="gls" value="1"></td><td class="ctr"><input type="checkbox" name="glu" value="1"></td><td><input type="text" name="glr" placeholder="Remarks…"></td></tr>
+          <tr><td style="font-weight:600">🥼 Lab Coats / Overalls</td><td class="ctr"><input type="checkbox" name="ca" value="1"></td><td class="ctr"><input type="checkbox" name="cs" value="1"></td><td class="ctr"><input type="checkbox" name="cu" value="1"></td><td><input type="text" name="cr" placeholder="Remarks…"></td></tr>
+        </tbody>
+      </table>
+      </div>
+      <hr class="divider">
+      <div class="two-col">
+        <div class="field-group"><label class="field-label">PPE policy communicated</label><div class="radio-pair"><label><input type="radio" name="ppePolicyCom" value="Yes"> Yes</label><label><input type="radio" name="ppePolicyCom" value="No"> No</label></div></div>
+        <div class="field-group"><label class="field-label">Enforcement observed</label><div class="radio-pair"><label><input type="radio" name="ppeEnf" value="Yes"> Yes</label><label><input type="radio" name="ppeEnf" value="No"> No</label></div></div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header"><div class="card-icon">🎓</div><div class="card-title">Section 7 — Training, Induction &amp; Competence</div></div>
+    <div class="card-body">
+      <div style="overflow-x:auto">
+      <table class="tbl">
+        <thead><tr><th>Area</th><th class="ctr">Yes</th><th class="ctr">No</th><th style="min-width:150px">Remarks</th></tr></thead>
+        <tbody>
+          <tr><td>Safety induction for new staff</td><td class="ctr"><input type="radio" name="tr1" value="Yes"></td><td class="ctr"><input type="radio" name="tr1" value="No"></td><td><input type="text" name="tr1r" placeholder="Remarks…"></td></tr>
+          <tr><td>Safety induction for students</td><td class="ctr"><input type="radio" name="tr2" value="Yes"></td><td class="ctr"><input type="radio" name="tr2" value="No"></td><td><input type="text" name="tr2r" placeholder="Remarks…"></td></tr>
+          <tr><td>Specialized training (labs/workshops)</td><td class="ctr"><input type="radio" name="tr3" value="Yes"></td><td class="ctr"><input type="radio" name="tr3" value="No"></td><td><input type="text" name="tr3r" placeholder="Remarks…"></td></tr>
+          <tr><td>Records of training maintained</td><td class="ctr"><input type="radio" name="tr4" value="Yes"></td><td class="ctr"><input type="radio" name="tr4" value="No"></td><td><input type="text" name="tr4r" placeholder="Remarks…"></td></tr>
+          <tr><td>Competence of supervisors verified</td><td class="ctr"><input type="radio" name="tr5" value="Yes"></td><td class="ctr"><input type="radio" name="tr5" value="No"></td><td><input type="text" name="tr5r" placeholder="Remarks…"></td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+  </div>
+  <div class="nav-buttons">
+    <button type="button" class="btn btn-prev" onclick="goPrev(3)">← Back</button>
+    <div class="page-counter">Page 3 of 7</div>
+    <button type="button" class="btn btn-next" onclick="goNext(3)">Next: Emergency &amp; Incidents →</button>
+  </div>
+</div>
+
+<!-- PAGE 4 -->
+<div class="form-page" data-page="4">
+  <div class="page-hero">
+    <div class="page-hero-num">4</div>
+    <h2>Emergency &amp; Incident Management</h2>
+    <p>Review emergency preparedness, incident reporting and occupational health systems.</p>
+  </div>
+  <div class="card">
+    <div class="card-header"><div class="card-icon">🚨</div><div class="card-title">Section 8 — Emergency Preparedness &amp; Response</div></div>
+    <div class="card-body">
+      <div style="overflow-x:auto">
+      <table class="tbl">
+        <thead><tr><th>Requirement</th><th class="ctr">Yes</th><th class="ctr">No</th><th style="min-width:150px">Remarks</th></tr></thead>
+        <tbody>
+          <tr><td>Emergency response plan exists</td><td class="ctr"><input type="radio" name="em1" value="Yes"></td><td class="ctr"><input type="radio" name="em1" value="No"></td><td><input type="text" name="em1r" placeholder="Remarks…"></td></tr>
+          <tr><td>Fire extinguishers available &amp; serviced</td><td class="ctr"><input type="radio" name="em2" value="Yes"></td><td class="ctr"><input type="radio" name="em2" value="No"></td><td><input type="text" name="em2r" placeholder="Remarks…"></td></tr>
+          <tr><td>Emergency exits clearly marked</td><td class="ctr"><input type="radio" name="em3" value="Yes"></td><td class="ctr"><input type="radio" name="em3" value="No"></td><td><input type="text" name="em3r" placeholder="Remarks…"></td></tr>
+          <tr><td>Assembly points identified</td><td class="ctr"><input type="radio" name="em4" value="Yes"></td><td class="ctr"><input type="radio" name="em4" value="No"></td><td><input type="text" name="em4r" placeholder="Remarks…"></td></tr>
+          <tr><td>Drills conducted periodically</td><td class="ctr"><input type="radio" name="em5" value="Yes"></td><td class="ctr"><input type="radio" name="em5" value="No"></td><td><input type="text" name="em5r" placeholder="Remarks…"></td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header"><div class="card-icon">📊</div><div class="card-title">Section 9 — Incident, Accident &amp; Near-Miss Management</div></div>
+    <div class="card-body">
+      <div style="overflow-x:auto">
+      <table class="tbl">
+        <thead><tr><th>Item</th><th class="ctr">Yes</th><th class="ctr">No</th><th style="min-width:150px">Remarks</th></tr></thead>
+        <tbody>
+          <tr><td>Reporting system exists</td><td class="ctr"><input type="radio" name="inc1" value="Yes"></td><td class="ctr"><input type="radio" name="inc1" value="No"></td><td><input type="text" name="inc1r" placeholder="Remarks…"></td></tr>
+          <tr><td>Investigation procedures defined</td><td class="ctr"><input type="radio" name="inc2" value="Yes"></td><td class="ctr"><input type="radio" name="inc2" value="No"></td><td><input type="text" name="inc2r" placeholder="Remarks…"></td></tr>
+          <tr><td>Corrective actions implemented</td><td class="ctr"><input type="radio" name="inc3" value="Yes"></td><td class="ctr"><input type="radio" name="inc3" value="No"></td><td><input type="text" name="inc3r" placeholder="Remarks…"></td></tr>
+          <tr><td>Incident trends reviewed</td><td class="ctr"><input type="radio" name="inc4" value="Yes"></td><td class="ctr"><input type="radio" name="inc4" value="No"></td><td><input type="text" name="inc4r" placeholder="Remarks…"></td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header"><div class="card-icon">🏥</div><div class="card-title">Section 10 — Health Surveillance &amp; Occupational Health</div></div>
+    <div class="card-body">
+      <div style="overflow-x:auto">
+      <table class="tbl">
+        <thead><tr><th>Requirement</th><th class="ctr">Yes</th><th class="ctr">No</th><th style="min-width:150px">Remarks</th></tr></thead>
+        <tbody>
+          <tr><td>Exposure monitoring (noise, chemicals)</td><td class="ctr"><input type="radio" name="oh1" value="Yes"></td><td class="ctr"><input type="radio" name="oh1" value="No"></td><td><input type="text" name="oh1r" placeholder="Remarks…"></td></tr>
+          <tr><td>First aid facilities available</td><td class="ctr"><input type="radio" name="oh2" value="Yes"></td><td class="ctr"><input type="radio" name="oh2" value="No"></td><td><input type="text" name="oh2r" placeholder="Remarks…"></td></tr>
+          <tr><td>Trained first aiders</td><td class="ctr"><input type="radio" name="oh3" value="Yes"></td><td class="ctr"><input type="radio" name="oh3" value="No"></td><td><input type="text" name="oh3r" placeholder="Remarks…"></td></tr>
+          <tr><td>Access to medical support</td><td class="ctr"><input type="radio" name="oh4" value="Yes"></td><td class="ctr"><input type="radio" name="oh4" value="No"></td><td><input type="text" name="oh4r" placeholder="Remarks…"></td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+  </div>
+  <div class="nav-buttons">
+    <button type="button" class="btn btn-prev" onclick="goPrev(4)">← Back</button>
+    <div class="page-counter">Page 4 of 7</div>
+    <button type="button" class="btn btn-next" onclick="goNext(4)">Next: Culture &amp; Compliance →</button>
+  </div>
+</div>
+
+<!-- PAGE 5 -->
+<div class="form-page" data-page="5">
+  <div class="page-hero">
+    <div class="page-hero-num">5</div>
+    <h2>Safety Culture &amp; Legal Compliance</h2>
+    <p>Evaluate communication culture and confirm regulatory compliance status.</p>
+  </div>
+  <div class="card">
+    <div class="card-header"><div class="card-icon">🗣️</div><div class="card-title">Section 11 — Communication &amp; Safety Culture</div></div>
+    <div class="card-body">
+      <div style="overflow-x:auto">
+      <table class="tbl">
+        <thead><tr><th>Indicator</th><th class="ctr">Yes</th><th class="ctr">No</th><th style="min-width:150px">Remarks</th></tr></thead>
+        <tbody>
+          <tr><td>Safety signs displayed</td><td class="ctr"><input type="radio" name="sc1" value="Yes"></td><td class="ctr"><input type="radio" name="sc1" value="No"></td><td><input type="text" name="sc1r" placeholder="Remarks…"></td></tr>
+          <tr><td>Safety meetings conducted</td><td class="ctr"><input type="radio" name="sc2" value="Yes"></td><td class="ctr"><input type="radio" name="sc2" value="No"></td><td><input type="text" name="sc2r" placeholder="Remarks…"></td></tr>
+          <tr><td>Staff/student engagement</td><td class="ctr"><input type="radio" name="sc3" value="Yes"></td><td class="ctr"><input type="radio" name="sc3" value="No"></td><td><input type="text" name="sc3r" placeholder="Remarks…"></td></tr>
+          <tr><td>Reporting without fear</td><td class="ctr"><input type="radio" name="sc4" value="Yes"></td><td class="ctr"><input type="radio" name="sc4" value="No"></td><td><input type="text" name="sc4r" placeholder="Remarks…"></td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header"><div class="card-icon">⚖️</div><div class="card-title">Section 12 — Legal &amp; Regulatory Compliance</div></div>
+    <div class="card-body">
+      <div class="two-col" style="margin-bottom:1rem">
+        <div class="field-group"><label class="field-label">Applicable laws identified</label><div class="radio-pair"><label><input type="radio" name="leg1" value="Yes"> Yes</label><label><input type="radio" name="leg1" value="No"> No</label></div></div>
+        <div class="field-group"><label class="field-label">Permits / certifications valid</label><div class="radio-pair"><label><input type="radio" name="leg2" value="Yes"> Yes</label><label><input type="radio" name="leg2" value="No"> No</label></div></div>
+        <div class="field-group"><label class="field-label">Compliance gaps identified</label><div class="radio-pair"><label><input type="radio" name="leg3" value="Yes"> Yes</label><label><input type="radio" name="leg3" value="No"> No</label></div></div>
+      </div>
+      <div class="field-group"><label class="field-label">Details / Notes on Compliance</label><textarea name="legalDetails" placeholder="Provide details on compliance, gaps, or actions taken…"></textarea></div>
+    </div>
+  </div>
+  <div class="nav-buttons">
+    <button type="button" class="btn btn-prev" onclick="goPrev(5)">← Back</button>
+    <div class="page-counter">Page 5 of 7</div>
+    <button type="button" class="btn btn-next" onclick="goNext(5)">Next: Strengths &amp; Gaps →</button>
+  </div>
+</div>
+
+<!-- PAGE 6 -->
+<div class="form-page" data-page="6">
+  <div class="page-hero">
+    <div class="page-hero-num">6</div>
+    <h2>Strengths, Gaps &amp; Overall Summary</h2>
+    <p>Document identified strengths, non-conformities and the overall H&amp;S system status.</p>
+  </div>
+  <div class="card">
+    <div class="card-header"><div class="card-icon">✅</div><div class="card-title">Section 13 — Strengths Identified</div></div>
+    <div class="card-body">
+      <table class="tbl">
+        <thead><tr><th style="width:40px">#</th><th>Comment</th></tr></thead>
+        <tbody>
+          <tr><td style="text-align:center;color:var(--muted);font-weight:700;font-size:.8rem">1</td><td><input type="text" name="st[]" placeholder="Strength identified…"></td></tr>
+          <tr><td style="text-align:center;color:var(--muted);font-weight:700;font-size:.8rem">2</td><td><input type="text" name="st[]" placeholder="Strength identified…"></td></tr>
+          <tr><td style="text-align:center;color:var(--muted);font-weight:700;font-size:.8rem">3</td><td><input type="text" name="st[]" placeholder="Strength identified…"></td></tr>
+          <tr><td style="text-align:center;color:var(--muted);font-weight:700;font-size:.8rem">4</td><td><input type="text" name="st[]" placeholder="Strength identified…"></td></tr>
+          <tr><td style="text-align:center;color:var(--muted);font-weight:700;font-size:.8rem">5</td><td><input type="text" name="st[]" placeholder="Strength identified…"></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header"><div class="card-icon">⚠️</div><div class="card-title">Section 14 — Gaps / Non-Conformities</div></div>
+    <div class="card-body">
+      <div style="overflow-x:auto">
+      <table class="tbl">
+        <thead><tr><th style="width:36px">#</th><th style="min-width:150px">Issue</th><th style="width:72px">Risk</th><th style="min-width:150px">Recommended Action</th><th style="min-width:95px">Priority</th></tr></thead>
+        <tbody>
+          <tr><td style="text-align:center;color:var(--muted);font-weight:700;font-size:.8rem">1</td><td><input type="text" name="gi[]" placeholder="Issue…"></td><td><select name="gr3[]"><option value="">--</option><option>H</option><option>M</option><option>L</option></select></td><td><input type="text" name="ga3[]" placeholder="Action…"></td><td><input type="text" name="gp[]" placeholder="Priority…"></td></tr>
+          <tr><td style="text-align:center;color:var(--muted);font-weight:700;font-size:.8rem">2</td><td><input type="text" name="gi[]" placeholder="Issue…"></td><td><select name="gr3[]"><option value="">--</option><option>H</option><option>M</option><option>L</option></select></td><td><input type="text" name="ga3[]" placeholder="Action…"></td><td><input type="text" name="gp[]" placeholder="Priority…"></td></tr>
+          <tr><td style="text-align:center;color:var(--muted);font-weight:700;font-size:.8rem">3</td><td><input type="text" name="gi[]" placeholder="Issue…"></td><td><select name="gr3[]"><option value="">--</option><option>H</option><option>M</option><option>L</option></select></td><td><input type="text" name="ga3[]" placeholder="Action…"></td><td><input type="text" name="gp[]" placeholder="Priority…"></td></tr>
+          <tr><td style="text-align:center;color:var(--muted);font-weight:700;font-size:.8rem">4</td><td><input type="text" name="gi[]" placeholder="Issue…"></td><td><select name="gr3[]"><option value="">--</option><option>H</option><option>M</option><option>L</option></select></td><td><input type="text" name="ga3[]" placeholder="Action…"></td><td><input type="text" name="gp[]" placeholder="Priority…"></td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header"><div class="card-icon">📋</div><div class="card-title">Section 15 — Overall Assessment Summary</div></div>
+    <div class="card-body">
+      <div class="field-group">
+        <label class="field-label">Overall H&amp;S System Status</label>
+        <div class="status-grid">
+          <label class="status-chip ok"><input type="radio" name="overallStatus" value="Adequate"> ✅ Adequate</label>
+          <label class="status-chip partial"><input type="radio" name="overallStatus" value="Partially Adequate"> ⚠️ Partially Adequate</label>
+          <label class="status-chip bad"><input type="radio" name="overallStatus" value="Inadequate"> ❌ Inadequate</label>
+        </div>
+      </div>
+      <hr class="divider">
+      <div class="field-group">
+        <label class="field-label">Immediate Actions — Key Risk Areas</label>
+        <table class="tbl" style="margin-top:.3rem">
+          <thead><tr><th style="width:36px">#</th><th>Key Risk Area</th><th>Action Required</th></tr></thead>
+          <tbody>
+            <tr><td style="text-align:center;color:var(--muted);font-weight:700;font-size:.8rem">1</td><td><input type="text" name="ra[]" placeholder="Risk area…"></td><td><input type="text" name="ract[]" placeholder="Action required…"></td></tr>
+            <tr><td style="text-align:center;color:var(--muted);font-weight:700;font-size:.8rem">2</td><td><input type="text" name="ra[]" placeholder="Risk area…"></td><td><input type="text" name="ract[]" placeholder="Action required…"></td></tr>
+            <tr><td style="text-align:center;color:var(--muted);font-weight:700;font-size:.8rem">3</td><td><input type="text" name="ra[]" placeholder="Risk area…"></td><td><input type="text" name="ract[]" placeholder="Action required…"></td></tr>
+            <tr><td style="text-align:center;color:var(--muted);font-weight:700;font-size:.8rem">4</td><td><input type="text" name="ra[]" placeholder="Risk area…"></td><td><input type="text" name="ract[]" placeholder="Action required…"></td></tr>
+            <tr><td style="text-align:center;color:var(--muted);font-weight:700;font-size:.8rem">5</td><td><input type="text" name="ra[]" placeholder="Risk area…"></td><td><input type="text" name="ract[]" placeholder="Action required…"></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="nav-buttons">
+    <button type="button" class="btn btn-prev" onclick="goPrev(6)">← Back</button>
+    <div class="page-counter">Page 6 of 7</div>
+    <button type="button" class="btn btn-next" onclick="goNext(6)">Next: Recommendations →</button>
+  </div>
+</div>
+
+<!-- PAGE 7 -->
+<div class="form-page" data-page="7">
+  <div class="page-hero">
+    <div class="page-hero-num">7</div>
+    <h2>Recommendations &amp; Sign-Off</h2>
+    <p>Provide final recommendations and authorise the assessment with your signature.</p>
+  </div>
+  <div class="card">
+    <div class="card-header"><div class="card-icon">💡</div><div class="card-title">Section 16 — Recommendations</div></div>
+    <div class="card-body">
+      <table class="tbl">
+        <thead><tr><th style="width:40px">#</th><th>Recommendation</th></tr></thead>
+        <tbody>
+          <tr><td style="text-align:center;color:var(--muted);font-weight:700;font-size:.8rem">1</td><td><input type="text" name="rec[]" placeholder="Recommendation…"></td></tr>
+          <tr><td style="text-align:center;color:var(--muted);font-weight:700;font-size:.8rem">2</td><td><input type="text" name="rec[]" placeholder="Recommendation…"></td></tr>
+          <tr><td style="text-align:center;color:var(--muted);font-weight:700;font-size:.8rem">3</td><td><input type="text" name="rec[]" placeholder="Recommendation…"></td></tr>
+          <tr><td style="text-align:center;color:var(--muted);font-weight:700;font-size:.8rem">4</td><td><input type="text" name="rec[]" placeholder="Recommendation…"></td></tr>
+          <tr><td style="text-align:center;color:var(--muted);font-weight:700;font-size:.8rem">5</td><td><input type="text" name="rec[]" placeholder="Recommendation…"></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header"><div class="card-icon">✍️</div><div class="card-title">Section 17 — Lead Assessor Sign-Off</div></div>
+    <div class="card-body">
+      <div class="two-col">
+        <div class="field-group"><label class="field-label">Lead Assessor Full Name <span class="req">*</span></label><input type="text" id="signName" placeholder="Full legal name" required></div>
+        <div class="field-group"><label class="field-label">Sign-Off Date <span class="req">*</span></label><input type="date" id="signDate" required></div>
+      </div>
+      <div class="field-group"><label class="field-label">Signature (type full name as authorisation)</label><input type="text" id="signSig" placeholder="Type your full name to sign and authorise this assessment"></div>
+      <div style="background:var(--green-faint);border:1px solid var(--border);border-radius:8px;padding:1rem;margin-top:.8rem;font-size:.82rem;color:var(--muted);line-height:1.6">
+        By submitting this form, the Lead Assessor confirms that all information is accurate and true to the best of their knowledge. This assessment will be logged to the KNUST College of Engineering Health &amp; Safety register on Google Sheets.
+      </div>
+    </div>
+  </div>
+  <div class="nav-buttons">
+    <button type="button" class="btn btn-prev" onclick="goPrev(7)">← Back</button>
+    <div class="page-counter">Page 7 of 7</div>
+    <button type="submit" class="btn btn-submit" id="submitBtn">
+      ✓&nbsp; Submit Assessment
+    </button>
+  </div>
+</div>
+
+</form>
+
+<!-- SUCCESS -->
+<div id="success-wrap">
+  <div class="success-ring">✅</div>
+  <h2>Assessment Submitted!</h2>
+  <p>Your Health &amp; Safety Systems Assessment has been successfully recorded and saved to the KNUST College of Engineering register.</p>
+  <div class="success-card">
+    <h3>Submission Summary</h3>
+    <div class="success-item"><span class="lbl">Department</span><span class="val" id="s_dept">—</span></div>
+    <div class="success-item"><span class="lbl">Location</span><span class="val" id="s_loc">—</span></div>
+    <div class="success-item"><span class="lbl">Date of Assessment</span><span class="val" id="s_date">—</span></div>
+    <div class="success-item"><span class="lbl">Lead Assessor</span><span class="val" id="s_lead">—</span></div>
+    <div class="success-item"><span class="lbl">Overall Status</span><span class="val" id="s_status">—</span></div>
+    <div class="success-item"><span class="lbl">Submitted At</span><span class="val" id="s_time">—</span></div>
+  </div>
+</div>
+
+</div>
+
+<footer>&copy; KNUST College of Engineering · Health &amp; Safety Systems Assessment · Powered by Google Sheets</footer>
+
+<script>
+const TOTAL=7;
+const URL_GS="https://script.google.com/macros/s/AKfycbzQ49ebOvpIuttMBXh7gkCRU857mK6T0Hr3v4yiEisPzHjwHdaPFyD744kWGVu81KymqA/exec";
+const SHEET="Sheet1";
+let cur=1;
+
+function buildDots(){
+  const w=document.getElementById('stepDots');w.innerHTML='';
+  for(let i=1;i<=TOTAL;i++){const d=document.createElement('div');d.className='step-dot'+(i<cur?' done':(i===cur?' active':''));w.appendChild(d);}
+  document.getElementById('progressLabel').textContent=`Step ${cur} of ${TOTAL}`;
+}
+function showPage(n){
+  document.querySelectorAll('.form-page').forEach(p=>p.classList.remove('active'));
+  document.querySelector(`[data-page="${n}"]`).classList.add('active');
+  cur=n;buildDots();window.scrollTo({top:0,behavior:'smooth'});
+}
+function goNext(from){
+  if(from===1){
+    const ok=['department','location','assessmentDate','leadAssessor'].every(id=>document.getElementById(id).value.trim());
+    if(!ok){alert('Please fill in all required fields (marked *) before continuing.');return;}
+  }
+  if(from<TOTAL)showPage(from+1);
+}
+function goPrev(from){if(from>1)showPage(from-1);}
+buildDots();
+
+function rv(n){const e=document.querySelector(`input[name="${n}"]:checked`);return e?e.value:'';}
+function cv(n){return[...document.querySelectorAll(`input[name="${n}"]:checked`)].map(e=>e.value).join(', ');}
+function tv(n){const e=document.querySelector(`[name="${n}"]`);return e?e.value.trim():'';}
+function mv(n){return[...document.querySelectorAll(`input[name="${n}"]`)].map(e=>e.value.trim()).filter(Boolean).join(' | ');}
+function chkv(n){return document.querySelector(`input[name="${n}"]`)?.checked?'Yes':'No';}
+function ppe(a,s,u){return(document.querySelector(`input[name="${a}"]`)?.checked?'Avail ':'')+
+                           (document.querySelector(`input[name="${s}"]`)?.checked?'Suit ':'')+
+                           (document.querySelector(`input[name="${u}"]`)?.checked?'Used':'');}
+function gi(id){const e=document.getElementById(id);return e?e.value.trim():'';}
+
+document.getElementById('hsForm').addEventListener('submit',async function(e){
+  e.preventDefault();
+  if(!gi('signName')||!gi('signDate')){alert('Please fill in the Lead Assessor name and sign-off date.');return;}
+  const btn=document.getElementById('submitBtn');btn.disabled=true;btn.innerHTML='<span class="spinner"></span> Submitting…';
+
+  const hA=[...document.querySelectorAll('input[name="ha[]"]')];
+  const hH=[...document.querySelectorAll('input[name="hh[]"]')];
+  const hR=[...document.querySelectorAll('select[name="hr[]"]')];
+  const hC=[...document.querySelectorAll('input[name="hc[]"]')];
+  const hD=[...document.querySelectorAll('input[name="hd[]"]')];
+  const hazRows=hA.map((_,i)=>`[${hA[i].value}|${hH[i].value}|${hR[i].value}|${hC[i].value}|${hD[i].value}]`).filter(r=>r!=='[||||]').join(', ');
+
+  const gI=[...document.querySelectorAll('input[name="gi[]"]')];
+  const gR=[...document.querySelectorAll('select[name="gr3[]"]')];
+  const gA=[...document.querySelectorAll('input[name="ga3[]"]')];
+  const gP=[...document.querySelectorAll('input[name="gp[]"]')];
+  const gapRows=gI.map((_,i)=>`[${gI[i].value}|${gR[i].value}|${gA[i].value}|${gP[i].value}]`).filter(r=>r!=='[|||]').join(', ');
+
+  const rA=[...document.querySelectorAll('input[name="ra[]"]')];
+  const rAct=[...document.querySelectorAll('input[name="ract[]"]')];
+  const riskRows=rA.map((_,i)=>`[${rA[i].value}|${rAct[i].value}]`).filter(r=>r!=='[|]').join(', ');
+
+  const overallStatus=rv('overallStatus');
+
+  const data={
+    department:gi('department'),location:gi('location'),assessmentDate:gi('assessmentDate'),leadAssessor:gi('leadAssessor'),
+    areaTypes:cv('areaType'),teamMembers:mv('team'),methodology:cv('methodology'),
+    gov_policyExists:rv('gov1'),gov_policyExists_rem:tv('gov1_rem'),
+    gov_policyCom:rv('gov2'),gov_policyCom_rem:tv('gov2_rem'),
+    gov_roles:rv('gov3'),gov_roles_rem:tv('gov3_rem'),
+    gov_committee:rv('gov4'),gov_committee_rem:tv('gov4_rem'),
+    gov_compliance:rv('gov5'),gov_compliance_rem:tv('gov5_rem'),
+    govObservations:tv('govObs'),
+    hazardRows,riskDocumented:rv('riskDoc'),riskFrequency:rv('riskFreq'),riskObservations:tv('riskObs'),
+    inf_layout:rv('inf1'),inf_layout_rem:tv('inf1r'),
+    inf_machine:rv('inf2'),inf_machine_rem:tv('inf2r'),
+    inf_elec:rv('inf3'),inf_elec_rem:tv('inf3r'),
+    inf_chem:rv('inf4'),inf_chem_rem:tv('inf4r'),
+    inf_vent:rv('inf5'),inf_vent_rem:tv('inf5r'),
+    bld_struct:rv('bld1'),bld_struct_rem:tv('bld1r'),
+    bld_walk:rv('bld2'),bld_walk_rem:tv('bld2r'),
+    bld_emLight:rv('bld3'),bld_emLight_rem:tv('bld3r'),
+    bld_fire:rv('bld4'),bld_fire_rem:tv('bld4r'),
+    ppe_boots:ppe('ba','bs','bu'),ppe_boots_rem:tv('br'),
+    ppe_helm:ppe('ha2','hs2','hu2'),ppe_helm_rem:tv('hr2'),
+    ppe_gog:ppe('ga','gs','gu'),ppe_gog_rem:tv('gr'),
+    ppe_glove:ppe('gla','gls','glu'),ppe_glove_rem:tv('glr'),
+    ppe_coat:ppe('ca','cs','cu'),ppe_coat_rem:tv('cr'),
+    ppePolicyCom:rv('ppePolicyCom'),ppeEnforcement:rv('ppeEnf'),
+    tr_staffInduction:rv('tr1'),tr_staffInduction_rem:tv('tr1r'),
+    tr_studentInduction:rv('tr2'),tr_studentInduction_rem:tv('tr2r'),
+    tr_specialized:rv('tr3'),tr_specialized_rem:tv('tr3r'),
+    tr_records:rv('tr4'),tr_records_rem:tv('tr4r'),
+    tr_competence:rv('tr5'),tr_competence_rem:tv('tr5r'),
+    em_plan:rv('em1'),em_plan_rem:tv('em1r'),
+    em_extinguisher:rv('em2'),em_extinguisher_rem:tv('em2r'),
+    em_exits:rv('em3'),em_exits_rem:tv('em3r'),
+    em_assembly:rv('em4'),em_assembly_rem:tv('em4r'),
+    em_drills:rv('em5'),em_drills_rem:tv('em5r'),
+    inc_reporting:rv('inc1'),inc_reporting_rem:tv('inc1r'),
+    inc_investigation:rv('inc2'),inc_investigation_rem:tv('inc2r'),
+    inc_corrective:rv('inc3'),inc_corrective_rem:tv('inc3r'),
+    inc_trends:rv('inc4'),inc_trends_rem:tv('inc4r'),
+    oh_monitoring:rv('oh1'),oh_monitoring_rem:tv('oh1r'),
+    oh_firstaid:rv('oh2'),oh_firstaid_rem:tv('oh2r'),
+    oh_aiders:rv('oh3'),oh_aiders_rem:tv('oh3r'),
+    oh_medical:rv('oh4'),oh_medical_rem:tv('oh4r'),
+    sc_signs:rv('sc1'),sc_signs_rem:tv('sc1r'),
+    sc_meetings:rv('sc2'),sc_meetings_rem:tv('sc2r'),
+    sc_engagement:rv('sc3'),sc_engagement_rem:tv('sc3r'),
+    sc_reporting:rv('sc4'),sc_reporting_rem:tv('sc4r'),
+    leg_laws:rv('leg1'),leg_permits:rv('leg2'),leg_gaps:rv('leg3'),legalDetails:tv('legalDetails'),
+    strengths:[...document.querySelectorAll('input[name="st[]"]')].map(e=>e.value.trim()).filter(Boolean).join(' | '),
+    gapRows,overallStatus,immediateActions:riskRows,
+    recommendations:[...document.querySelectorAll('input[name="rec[]"]')].map(e=>e.value.trim()).filter(Boolean).join(' | '),
+    signoffName:gi('signName'),signoffDate:gi('signDate'),signoffSig:gi('signSig'),
+    timestamp:new Date().toLocaleString()
+  };
+
+  try{
+    await fetch(`${URL_GS}?sheet=${SHEET}`,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+  }catch(err){console.error(err);}
+
+  document.getElementById('s_dept').textContent=data.department;
+  document.getElementById('s_loc').textContent=data.location;
+  document.getElementById('s_date').textContent=data.assessmentDate;
+  document.getElementById('s_lead').textContent=data.leadAssessor;
+  document.getElementById('s_status').textContent=overallStatus||'Not specified';
+  document.getElementById('s_time').textContent=data.timestamp;
+
+  document.getElementById('hsForm').style.display='none';
+  const sw=document.getElementById('success-wrap');
+  sw.classList.add('show');
+  window.scrollTo({top:0,behavior:'smooth'});
+});
+</script>
+</body>
+</html>
